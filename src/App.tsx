@@ -12,7 +12,7 @@ import { useSchedulerStore } from './store/useSchedulerStore';
 const isAdminDomain = window.location.hostname.startsWith('admin.');
 
 function App() {
-  const [activeTab, setActiveTab] = useState<'schedule' | 'shifts' | 'stats' | 'validation' | 'residents' | 'control'>('schedule');
+  const [activeTab, setActiveTab] = useState<'schedule' | 'shifts' | 'stats' | 'validation' | 'residents' | 'control'>('control');
   const [showAdminLogin, setShowAdminLogin] = useState(false);
   const { setMonthYear, isAdminMode, exitAdminMode, loadFromServer } = useSchedulerStore();
 
@@ -30,6 +30,29 @@ function App() {
       setShowAdminLogin(false);
     }
   };
+
+  // Public view: just the control panel, no tabs
+  if (!isAdminDomain) {
+    return (
+      <div className="min-h-screen bg-gray-50 text-gray-900" dir="rtl">
+        <header className="bg-white border-b sticky top-0 z-10">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center h-16 gap-2">
+              <div className="bg-blue-600 p-2 rounded-lg">
+                <Calendar className="w-5 h-5 text-white" />
+              </div>
+              <h1 className="text-xl font-bold bg-gradient-to-l from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                Medical Scheduler V2
+              </h1>
+            </div>
+          </div>
+        </header>
+        <main className="max-w-full px-4 sm:px-6 lg:px-8 py-8">
+          <ControlView />
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900" dir="rtl">
@@ -110,28 +133,24 @@ function App() {
                 </>
               )}
 
-              {isAdminDomain && (
-                <>
-                  <div className="hidden md:block w-px h-6 bg-gray-300 mx-1 shrink-0" />
-                  {isAdminMode ? (
-                    <button
-                      onClick={exitAdminMode}
-                      title="Exit admin mode"
-                      className="flex items-center gap-1.5 px-3 py-2 rounded-md bg-green-50 text-green-700 border border-green-200 hover:bg-green-100 text-sm font-medium whitespace-nowrap shrink-0"
-                    >
-                      <LockOpen className="w-4 h-4" />
-                      {'מנהל'}
-                    </button>
-                  ) : (
-                    <button
-                      onClick={() => setShowAdminLogin(true)}
-                      title="Admin login"
-                      className="flex items-center gap-1.5 px-3 py-2 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 text-sm whitespace-nowrap shrink-0"
-                    >
-                      <Lock className="w-4 h-4" />
-                    </button>
-                  )}
-                </>
+              <div className="hidden md:block w-px h-6 bg-gray-300 mx-1 shrink-0" />
+              {isAdminMode ? (
+                <button
+                  onClick={exitAdminMode}
+                  title="Exit admin mode"
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-md bg-green-50 text-green-700 border border-green-200 hover:bg-green-100 text-sm font-medium whitespace-nowrap shrink-0"
+                >
+                  <LockOpen className="w-4 h-4" />
+                  {'מנהל'}
+                </button>
+              ) : (
+                <button
+                  onClick={() => setShowAdminLogin(true)}
+                  title="Admin login"
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 text-sm whitespace-nowrap shrink-0"
+                >
+                  <Lock className="w-4 h-4" />
+                </button>
               )}
             </nav>
           </div>
