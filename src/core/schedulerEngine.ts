@@ -141,7 +141,7 @@ export function generateSchedule(input: EngineInput): Schedule {
 
     // OR rooms: group them so each gets exactly 1 resident (not all in p_or1)
     // Detect OR groups by naming pattern (p_or1, p_or2, p_or3)
-    const orGroupIds = ['p_or1', 'p_or2', 'p_or3'];
+    const _orGroupIds = ['p_or1', 'p_or2', 'p_or3'];
 
     sortedDailyPosts.forEach(post => {
       // Check if post should run today
