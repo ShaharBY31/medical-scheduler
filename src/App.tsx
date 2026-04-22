@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import ControlView from './components/ControlView';
 import ResidentManager from './components/ResidentManager';
 import ScheduleGrid from './components/ScheduleGrid';
 import ShiftsTable from './components/ShiftsTable';
@@ -10,7 +11,7 @@ import { useSchedulerStore } from './store/useSchedulerStore';
 const isAdminDomain = window.location.hostname.startsWith('admin.');
 
 function App() {
-  const [activeTab, setActiveTab] = useState<'schedule' | 'shifts' | 'stats' | 'validation' | 'residents' | 'control'>('control');
+  const [activeTab, setActiveTab] = useState<'schedule' | 'shifts' | 'stats' | 'validation' | 'residents' | 'control'>('schedule');
   const { setMonthYear, isAdminMode, loadFromServer, setAdminMode } = useSchedulerStore();
 
   useEffect(() => {
