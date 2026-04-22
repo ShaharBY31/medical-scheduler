@@ -30,13 +30,13 @@ export default function ValidationPanel() {
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-      <div className="p-6 border-b border-gray-200 flex justify-between items-center bg-red-50/30">
+      <div className="p-4 border-b border-gray-200 flex justify-between items-center bg-red-50/30">
         <div>
-          <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-            <AlertCircle className={`w-5 h-5 ${criticals.length ? 'text-red-500' : 'text-green-500'}`} />
+          <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+            <AlertCircle className={`w-4 h-4 ${criticals.length ? 'text-red-500' : 'text-green-500'}`} />
             בקרת סריקת תקלות (QA)
           </h2>
-          <p className="text-sm text-gray-500 mt-1">מערכת חכמה שסורקת את הסידור ומתריעה על התנגשויות או שגיאות של חוקי העבודה</p>
+          <p className="text-xs text-gray-400 mt-0.5">סריקת סידור והתראה על התנגשויות ושגיאות</p>
         </div>
         <div className="flex gap-4">
            {criticals.length > 0 && (
@@ -60,7 +60,7 @@ export default function ValidationPanel() {
         </div>
       </div>
 
-      <div className="p-0">
+      <div className="p-0 overflow-x-auto">
         {anomalies.length === 0 ? (
           <div className="p-12 text-center text-green-600 flex flex-col items-center gap-3">
              <CheckCircle2 className="w-12 h-12" />
@@ -68,32 +68,32 @@ export default function ValidationPanel() {
              <p className="text-sm">לא נמצאו חריגות מהתקן, אין חוסר איוש ואין שיבוצים כפולים.</p>
           </div>
         ) : (
-          <table className="w-full text-right hover:border-collapse">
+          <table className="w-full text-right hover:border-collapse" style={{ fontSize: '12.5px', minWidth: '600px' }}>
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
-                <th className="px-6 py-4 text-sm font-semibold text-gray-600 w-16">רמת חומרה</th>
-                <th className="px-6 py-4 text-sm font-semibold text-gray-600 w-24">תאריך</th>
-                <th className="px-6 py-4 text-sm font-semibold text-gray-600 w-48">רופא מעורב</th>
-                <th className="px-6 py-4 text-sm font-semibold text-gray-600">תיאור התקלה / פעולה נדרשת</th>
+                <th className="px-3 py-2 text-xs font-semibold text-gray-500 w-16">רמת חומרה</th>
+                <th className="px-3 py-2 text-xs font-semibold text-gray-500 w-20">תאריך</th>
+                <th className="px-3 py-2 text-xs font-semibold text-gray-500 w-36">רופא</th>
+                <th className="px-3 py-2 text-xs font-semibold text-gray-500">תיאור התקלה</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
               {anomalies.map((anomaly, idx) => (
                 <tr key={`${anomaly.id}-${idx}`} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-6 py-4">
+                  <td className="px-3 py-1.5">
                      {anomaly.type === 'critical' ? (
-                        <span className="inline-flex items-center gap-1 text-red-600 bg-red-50 text-xs font-bold px-2 py-1 rounded">קריטי</span>
+                        <span className="inline-flex items-center gap-1 text-red-600 bg-red-50 text-xs font-bold px-2 py-0.5 rounded">קריטי</span>
                      ) : (
-                        <span className="inline-flex items-center gap-1 text-orange-600 bg-orange-50 text-xs font-bold px-2 py-1 rounded">אזהרה</span>
+                        <span className="inline-flex items-center gap-1 text-orange-600 bg-orange-50 text-xs font-bold px-2 py-0.5 rounded">אזהרה</span>
                      )}
                   </td>
-                  <td className="px-6 py-4 text-gray-700 font-medium">
+                  <td className="px-3 py-1.5 text-gray-600 text-xs">
                      {anomaly.day === 0 ? 'כללי' : `${anomaly.day}/${month + 1}/${year}`}
                   </td>
-                  <td className="px-6 py-4 font-medium text-gray-900">
+                  <td className="px-3 py-1.5 font-medium text-gray-900 text-xs">
                      {anomaly.residentName || '-'}
                   </td>
-                  <td className="px-6 py-4 text-gray-600">
+                  <td className="px-3 py-1.5 text-gray-600 text-xs">
                     {anomaly.message}
                   </td>
                 </tr>

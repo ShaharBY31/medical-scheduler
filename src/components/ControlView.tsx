@@ -1,6 +1,5 @@
 import { useMemo, useState, Fragment, useEffect } from 'react';
 import { useSchedulerStore } from '../store/useSchedulerStore';
-import CellEditorPopup from './CellEditorPopup';
 import { ChevronRight, ChevronLeft } from 'lucide-react';
 
 const SECTION_BREAKS: Record<string, string> = {
@@ -11,7 +10,7 @@ const SECTION_BREAKS: Record<string, string> = {
   'p_ex1':    'חוץ',
   'p_bahir':  'תורנויות',
   'p_sess_b': 'ססיות',
-  'p_rest':   'מעקב ומנוחה',
+  'p_rest':   'מעקב',
 };
 
 const SHIFT_ORDER = ['p_bahir', 'p_miyun', 'p_hazi', 'p_sess_b', 'p_sess_z', 'p_rest', 'p_vac'];
@@ -26,7 +25,7 @@ const ROW_LABEL: Record<string, string> = {
   'external': 'bg-orange-700 text-white',
   'shift':    'bg-rose-800 text-white',
   'tracking': 'bg-gray-600 text-white',
-  'default':  'bg-gray-100 text-gray-800',
+  'default':  'bg-gray-100 text-gray-700',
 };
 
 function rowCategory(post: { id: string; type: string }): string {
@@ -40,26 +39,12 @@ function rowCategory(post: { id: string; type: string }): string {
   return 'default';
 }
 
-export default function StationsTable() {
+export default function ControlView() {
   const { schedule, month, year, posts, residents } = useSchedulerStore();
-  const [editingCell, setEditingCell] = useState<{ day: number; postId: string; anchorEl: HTMLElement } | null>(null);
   const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const hasSchedule = Object.keys(schedule).length > 0;
 
-  const stationPosts = [...posts].sort((a, b) => {
-    const isAS = ['shift', 'session'].includes(a.type) || ['p_rest', 'p_vac'].includes(a.id);
-    const isBS = ['shift', 'session'].includes(b.type) || ['p_rest', 'p_vac'].includes(b.id);
-    if (isAS && !isBS) return 1;
-    if (!isAS && isBS) return -1;
-    if (isAS && isBS) {
-      const ai = SHIFT_ORDER.indexOf(a.id), bi = SHIFT_ORDER.indexOf(b.id);
-      if (ai === -1 && bi === -1) return 0;
-      if (ai === -1) return 1;
-      if (bi === -1) return -1;
-      return ai - bi;
-    }
-    return 0;
-  }).filter(p => p.daysOfWeek.length > 0 || ['p_rest', 'p_vac'].includes(p.id));
-
+  // Build weeks array (Sun-Sat)
   const weeks = useMemo(() => {
     const arr: (number | null)[][] = [];
     let cur: (number | null)[] = [];
@@ -85,30 +70,63 @@ export default function StationsTable() {
     return idx >= 0 ? idx : 0;
   }, [weeks, year, month]);
 
-  const [activeWeekIndex, setActiveWeekIndex] = useState(initialWeek);
-
-  // Update activeWeekIndex if initialWeek changes
+  const [weekIdx, setWeekIdx] = useState(initialWeek);
+  
+  // Update weekIdx if initialWeek changes
   useEffect(() => {
-    setActiveWeekIndex(initialWeek);
+    setWeekIdx(initialWeek);
   }, [initialWeek]);
 
-  const activeWeek = weeks[activeWeekIndex] ?? [];
+  const activeWeek = weeks[weekIdx] ?? [];
+
+  // Sort posts
+  const stationPosts = useMemo(() => [...posts].sort((a, b) => {
+    const isAS = ['shift', 'session'].includes(a.type) || ['p_rest', 'p_vac'].includes(a.id);
+    const isBS = ['shift', 'session'].includes(b.type) || ['p_rest', 'p_vac'].includes(b.id);
+    if (isAS && !isBS) return 1;
+    if (!isAS && isBS) return -1;
+    if (isAS && isBS) {
+      const ai = SHIFT_ORDER.indexOf(a.id), bi = SHIFT_ORDER.indexOf(b.id);
+      if (ai === -1 && bi === -1) return 0;
+      if (ai === -1) return 1;
+      if (bi === -1) return -1;
+      return ai - bi;
+    }
+    return 0;
+  }).filter(p => p.daysOfWeek.length > 0 || ['p_rest', 'p_vac'].includes(p.id)), [posts]);
+
   const monthLabel = new Date(year, month).toLocaleDateString('he-IL', { month: 'long', year: 'numeric' });
+
+  if (!hasSchedule) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 text-center">
+        <div className="w-16 h-16 rounded-full bg-indigo-50 flex items-center justify-center mx-auto mb-4">
+          <svg className="w-8 h-8 text-indigo-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
+              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+        </div>
+        <h3 className="text-base font-bold text-gray-600 mb-1">אין סידור פעיל לחודש זה</h3>
+        <p className="text-sm text-gray-400">עבור ל"סידור עבודה" וחולל סידור כדי להציגו כאן.</p>
+      </div>
+    );
+  }
 
   return (
     <div dir="rtl" className="flex flex-col gap-3">
-      {/* Month title */}
+      {/* Month title — centered */}
       <div className="text-center">
-        <h2 className="text-xl font-bold text-gray-800 tracking-tight">סידור עבודה — {monthLabel}</h2>
-        <p className="text-xs text-gray-400 mt-0.5">לחץ על תא לעריכה</p>
+        <h2 className="text-xl font-bold text-gray-800 tracking-tight">{monthLabel}</h2>
+        <p className="text-xs text-gray-400 mt-0.5">סביבת בקרה · קריאה בלבד</p>
       </div>
 
-      {/* Week nav buttons */}
+      {/* Big centered week nav */}
       <div className="flex items-center sm:justify-center gap-2 overflow-x-auto pb-2 px-1 hide-scrollbar snap-x">
         <button
-          onClick={() => setActiveWeekIndex(i => Math.max(0, i - 1))}
-          disabled={activeWeekIndex === 0}
+          onClick={() => setWeekIdx(i => Math.max(0, i - 1))}
+          disabled={weekIdx === 0}
           className="p-2 rounded-lg hover:bg-gray-100 disabled:opacity-25 transition-colors sticky right-0 bg-white/80 backdrop-blur-sm z-10 shrink-0"
+          title="שבוע קודם"
         >
           <ChevronRight className="w-5 h-5 text-gray-600" />
         </button>
@@ -119,42 +137,50 @@ export default function StationsTable() {
           return (
             <button
               key={i}
-              onClick={() => setActiveWeekIndex(i)}
+              onClick={() => setWeekIdx(i)}
               className={`flex flex-col items-center px-4 sm:px-5 py-2 rounded-xl font-bold transition-all shrink-0 snap-center ${
-                i === activeWeekIndex
-                  ? 'bg-slate-800 text-white shadow-md scale-105'
+                i === weekIdx
+                  ? 'bg-indigo-600 text-white shadow-md scale-105'
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
               }`}
             >
               <span className="text-sm sm:text-base leading-tight">שבוע {i + 1}</span>
-              <span className={`text-[10px] sm:text-[11px] font-normal leading-tight ${i === activeWeekIndex ? 'text-slate-300' : 'text-gray-400'}`}>
-                {first}–{last}
-              </span>
+              <span className={`text-[10px] sm:text-[11px] font-normal leading-tight ${
+                i === weekIdx ? 'text-indigo-200' : 'text-gray-400'
+              }`}>{first}–{last}</span>
             </button>
           );
         })}
 
         <button
-          onClick={() => setActiveWeekIndex(i => Math.min(weeks.length - 1, i + 1))}
-          disabled={activeWeekIndex === weeks.length - 1}
+          onClick={() => setWeekIdx(i => Math.min(weeks.length - 1, i + 1))}
+          disabled={weekIdx === weeks.length - 1}
           className="p-2 rounded-lg hover:bg-gray-100 disabled:opacity-25 transition-colors sticky left-0 bg-white/80 backdrop-blur-sm z-10 shrink-0"
+          title="שבוע הבא"
         >
           <ChevronLeft className="w-5 h-5 text-gray-600" />
         </button>
       </div>
 
-      {/* Auto-fit table, centered */}
+      {/* Table — auto-sized like Excel: each column = content width, centered */}
       <div className="flex justify-center">
-        <div className="rounded-xl border border-gray-200 shadow-sm bg-white overflow-x-auto">
+      <div className="rounded-xl border border-gray-200 shadow-sm bg-white overflow-x-auto">
           <table className="border-collapse" style={{ fontSize: '12.5px', tableLayout: 'auto', width: 'auto' }}>
             <thead>
               <tr>
-                <th className="bg-slate-900 text-slate-300 text-right px-2 py-1.5 sticky right-0 z-10 border-b border-slate-700 font-semibold whitespace-nowrap">
+                {/* Sticky row label — narrow */}
+                <th
+                  className="bg-slate-900 text-slate-300 text-right px-2 py-1.5 sticky right-0 z-10 border-b border-slate-700 font-semibold whitespace-nowrap"
+                >
                   תחנה
                 </th>
                 {activeWeek.map((day, i) => {
                   const isWE = i === 5 || i === 6;
-                  const isToday = day !== null && new Date().getDate() === day && new Date().getMonth() === month && new Date().getFullYear() === year;
+                  const isToday =
+                    day !== null &&
+                    new Date().getDate() === day &&
+                    new Date().getMonth() === month &&
+                    new Date().getFullYear() === year;
                   return (
                     <th
                       key={i}
@@ -190,6 +216,7 @@ export default function StationsTable() {
                       </tr>
                     )}
                     <tr className="group">
+                      {/* Row label — shrinks to text */}
                       <td
                         className={`text-right text-[11px] font-semibold whitespace-nowrap sticky right-0 z-10
                           border-b border-white/10 shadow-[2px_0_4px_rgba(0,0,0,0.08)]
@@ -204,36 +231,37 @@ export default function StationsTable() {
                         const isActive = post.daysOfWeek.includes(i);
 
                         if (day === null) {
-                          return <td key={i} className="bg-gray-50 border-b border-l border-gray-100" />;
+                          return (
+                            <td key={i} className="bg-gray-50 border-b border-l border-gray-100" />
+                          );
                         }
 
                         const ids = schedule[day]?.[post.id] ?? [];
-                        const names = ids.map(id => residents.find(r => r.id === id)?.name ?? id).join(', ');
+                        const names = ids
+                          .map(id => residents.find(r => r.id === id)?.name ?? id)
+                          .join(', ');
 
-                        let cellCls = 'border-b border-l border-gray-100 px-2 py-0.5 text-center whitespace-nowrap transition-colors cursor-pointer ';
+                        let cellCls = 'border-b border-l border-gray-100 px-2 py-0.5 text-center whitespace-nowrap ';
                         if (names) {
                           cellCls += isWE
-                            ? 'bg-slate-100 hover:bg-blue-50 hover:ring-1 hover:ring-inset hover:ring-blue-400 text-slate-800 font-semibold'
-                            : 'bg-white hover:bg-blue-50 hover:ring-1 hover:ring-inset hover:ring-blue-400 text-slate-900 font-semibold';
+                            ? 'bg-slate-100 text-slate-800 font-semibold'
+                            : 'bg-white text-slate-900 font-semibold';
                         } else if (!isActive || isWE) {
-                          cellCls += 'bg-slate-50/70 text-slate-200 hover:bg-blue-50/40';
+                          cellCls += 'bg-slate-50/70 text-slate-200';
                         } else {
-                          cellCls += 'bg-rose-50/40 text-rose-200 hover:bg-rose-100/60';
+                          cellCls += 'bg-rose-50/40 text-rose-200';
                         }
 
                         return (
-                          <td
-                            key={`${post.id}-${day}`}
-                            className={cellCls}
-                            onClick={(e) => setEditingCell({ day, postId: post.id, anchorEl: e.currentTarget })}
-                          >
+                          <td key={`${post.id}-${day}`} className={cellCls}>
                             {names && (
-                              <span className="leading-none" style={{ fontSize: 12 }} title={names}>
+                              <span
+                                className="leading-none"
+                                style={{ fontSize: 12 }}
+                                title={names}
+                              >
                                 {names}
                               </span>
-                            )}
-                            {!names && (
-                              <span className="opacity-0 group-hover:opacity-30 text-slate-400 text-sm leading-none">+</span>
                             )}
                           </td>
                         );
@@ -244,17 +272,8 @@ export default function StationsTable() {
               })}
             </tbody>
           </table>
-        </div>
       </div>
-
-      {editingCell && (
-        <CellEditorPopup
-          day={editingCell.day}
-          postId={editingCell.postId}
-          anchorEl={editingCell.anchorEl}
-          onClose={() => setEditingCell(null)}
-        />
-      )}
+      </div>
     </div>
   );
 }

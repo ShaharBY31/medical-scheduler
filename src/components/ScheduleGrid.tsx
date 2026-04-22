@@ -25,7 +25,7 @@ export default function ScheduleGrid() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+      <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-gray-200 gap-4">
         <div>
           <h2 className="text-xl font-bold text-gray-900 flex items-center gap-3">
             סידור תורנויות - 
@@ -43,13 +43,13 @@ export default function ScheduleGrid() {
           </h2>
           <p className="text-sm text-gray-500 mt-2">נהל את התורנויות וההקצאות לחודש הנבחר</p>
         </div>
-        <div className="flex gap-3">
+        <div className="flex flex-wrap gap-2 sm:gap-3 w-full xl:w-auto">
           <button 
             onClick={() => setIsImportModalOpen(true)}
-            className="flex items-center gap-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 px-4 py-2 rounded-lg font-medium transition-colors border border-emerald-200"
+            className="flex-1 sm:flex-none items-center justify-center gap-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 px-3 py-2 rounded-lg font-medium transition-colors border border-emerald-200 text-sm whitespace-nowrap flex"
           >
-            <DownloadCloud className="w-4 h-4" />
-            ייבוא נתונים
+            <DownloadCloud className="w-4 h-4 shrink-0" />
+            ייבוא
           </button>
           
           <button 
@@ -58,22 +58,22 @@ export default function ScheduleGrid() {
                  useSchedulerStore.getState().setSchedule({});
                }
             }}
-            className="flex items-center gap-2 bg-red-50 hover:bg-red-100 text-red-600 px-4 py-2 rounded-lg font-medium transition-colors border border-red-200"
+            className="flex-1 sm:flex-none items-center justify-center gap-2 bg-red-50 hover:bg-red-100 text-red-600 px-3 py-2 rounded-lg font-medium transition-colors border border-red-200 text-sm whitespace-nowrap flex"
           >
-            <Trash2 className="w-4 h-4" />
-            איפוס סידור
+            <Trash2 className="w-4 h-4 shrink-0" />
+            איפוס
           </button>
-          <button className="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg font-medium transition-colors border border-gray-300">
-            <Settings2 className="w-4 h-4" />
-            הגדרות מתקדמות
+          <button className="flex-1 sm:flex-none items-center justify-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-2 rounded-lg font-medium transition-colors border border-gray-300 text-sm whitespace-nowrap flex">
+            <Settings2 className="w-4 h-4 shrink-0" />
+            הגדרות
           </button>
           <button 
             onClick={handleGenerate}
             disabled={residents.length === 0}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors shadow-sm ${residents.length === 0 ? 'bg-blue-300 text-white cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 text-white'}`}
+            className={`w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors shadow-sm text-sm ${residents.length === 0 ? 'bg-blue-300 text-white cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 text-white'}`}
           >
-            <Play className="w-4 h-4" />
-            חולל סידור אוטומטי
+            <Play className="w-4 h-4 shrink-0" />
+            חולל סידור
           </button>
         </div>
       </div>

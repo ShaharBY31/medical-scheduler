@@ -81,7 +81,7 @@ export default function ResidentManager() {
       </div>
 
       <div className="p-0 overflow-x-auto">
-        <table className="w-full text-right">
+        <table className="w-full text-right" style={{ minWidth: '600px' }}>
           <thead className="bg-gray-50 border-b border-gray-200">
             <tr>
               <th className="px-6 py-4 text-sm font-semibold text-gray-600 w-12">#</th>

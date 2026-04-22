@@ -1,0 +1,25 @@
+services:
+  scheduler:
+    image: ghcr.io/shaharby31/medical-scheduler:latest
+    container_name: medical-scheduler
+    ports:
+      - "3838:3000"
+    volumes:
+      - /volume1/docker/medical-scheduler-data:/data
+    environment:
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-Caduceus2024}
+    restart: unless-stopped
+    labels:
+      - "com.centurylinklabs.watchtower.scope=medical-scheduler"
+
+  watchtower:
+    image: containrrr/watchtower
+    container_name: medical-scheduler-watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - WATCHTOWER_POLL_INTERVAL=120
+      - WATCHTOWER_CLEANUP=true
+      - WATCHTOWER_SCOPE=medical-scheduler
+    command: --scope medical-scheduler
+    restart: unless-stopped
