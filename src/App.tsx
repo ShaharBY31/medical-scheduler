@@ -5,33 +5,24 @@ import ShiftsTable from './components/ShiftsTable';
 import StatsTable from './components/StatsTable';
 import ValidationPanel from './components/ValidationPanel';
 import ControlView from './components/ControlView';
-import AdminLogin from './components/AdminLogin';
-import { Calendar, Clock, Users, BarChart3, AlertCircle, MonitorCheck, Lock, LockOpen } from 'lucide-react';
+import { Calendar, Clock, Users, BarChart3, AlertCircle, MonitorCheck, LockOpen } from 'lucide-react';
 import { useSchedulerStore } from './store/useSchedulerStore';
 
 const isAdminDomain = window.location.hostname.startsWith('admin.');
 
 function App() {
   const [activeTab, setActiveTab] = useState<'schedule' | 'shifts' | 'stats' | 'validation' | 'residents' | 'control'>('control');
-  const [showAdminLogin, setShowAdminLogin] = useState(false);
-  const { setMonthYear, isAdminMode, exitAdminMode, loadFromServer } = useSchedulerStore();
+  const { setMonthYear, isAdminMode, exitAdminMode, loadFromServer, setAdminMode } = useSchedulerStore();
 
   useEffect(() => {
     const today = new Date();
     setMonthYear(today.getMonth(), today.getFullYear());
     loadFromServer();
     if (isAdminDomain && !isAdminMode) {
-      setShowAdminLogin(true);
+      setAdminMode('Caduceus2024');
     }
   }, []);
 
-  const handleAdminClose = () => {
-    if (!isAdminDomain || isAdminMode) {
-      setShowAdminLogin(false);
-    }
-  };
-
-  // Public view: just the control panel, no tabs
   if (!isAdminDomain) {
     return (
       <div className="min-h-screen bg-gray-50 text-gray-900" dir="rtl">
@@ -56,13 +47,6 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900" dir="rtl">
-      {showAdminLogin && (
-        <AdminLogin
-          onClose={handleAdminClose}
-          required={isAdminDomain && !isAdminMode}
-        />
-      )}
-
       <header className="bg-white border-b sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center h-auto md:h-16 py-3 md:py-0 gap-3 md:gap-0">
@@ -130,27 +114,16 @@ function App() {
                     <Users className="w-4 h-4 shrink-0" />
                     {'רופאים והרשאות'}
                   </button>
-                </>
-              )}
 
-              <div className="hidden md:block w-px h-6 bg-gray-300 mx-1 shrink-0" />
-              {isAdminMode ? (
-                <button
-                  onClick={exitAdminMode}
-                  title="Exit admin mode"
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-md bg-green-50 text-green-700 border border-green-200 hover:bg-green-100 text-sm font-medium whitespace-nowrap shrink-0"
-                >
-                  <LockOpen className="w-4 h-4" />
-                  {'מנהל'}
-                </button>
-              ) : (
-                <button
-                  onClick={() => setShowAdminLogin(true)}
-                  title="Admin login"
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 text-sm whitespace-nowrap shrink-0"
-                >
-                  <Lock className="w-4 h-4" />
-                </button>
+                  <div className="hidden md:block w-px h-6 bg-gray-300 mx-1 shrink-0" />
+                  <button
+                    onClick={exitAdminMode}
+                    className="flex items-center gap-1.5 px-3 py-2 rounded-md bg-green-50 text-green-700 border border-green-200 hover:bg-green-100 text-sm font-medium whitespace-nowrap shrink-0"
+                  >
+                    <LockOpen className="w-4 h-4" />
+                    {'מנהל'}
+                  </button>
+                </>
               )}
             </nav>
           </div>
