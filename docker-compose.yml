@@ -17,9 +17,11 @@ services:
     container_name: medical-scheduler-watchtower
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - /root/.docker/config.json:/config.json:ro
     environment:
       - WATCHTOWER_POLL_INTERVAL=120
       - WATCHTOWER_CLEANUP=true
       - WATCHTOWER_SCOPE=medical-scheduler
+      - DOCKER_CONFIG=/
     command: --scope medical-scheduler
     restart: unless-stopped
