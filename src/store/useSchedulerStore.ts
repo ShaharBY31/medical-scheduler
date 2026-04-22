@@ -104,15 +104,15 @@ export const useSchedulerStore = create<SchedulerState>()(
       }),
       setMonthYear: (newMonth, newYear) => {
         const { month, year, schedule, schedules } = get();
-        const currentKey = ;
-        const newKey = ;
+        const currentKey = `${year}-${String(month + 1).padStart(2, '0')}`;
+        const newKey = `${newYear}-${String(newMonth + 1).padStart(2, '0')}`;
         const updatedSchedules = { ...schedules, [currentKey]: schedule };
         set({ month: newMonth, year: newYear, schedule: updatedSchedules[newKey] ?? {}, schedules: updatedSchedules });
       },
       runGenerator: (config) => {
         const { residents, posts, preferences, month, year } = get();
         const newSchedule = generateSchedule({ residents, posts, preferences, config });
-        const key = ;
+        const key = `${year}-${String(month + 1).padStart(2, '0')}`;
         set((state) => ({ schedule: newSchedule, schedules: { ...state.schedules, [key]: newSchedule } }));
       },
       setAdminMode: async (password: string): Promise<boolean> => {
@@ -142,7 +142,7 @@ export const useSchedulerStore = create<SchedulerState>()(
           const loadedSchedules = data.schedules ?? {};
           const m = data.month ?? get().month;
           const y = data.year ?? get().year;
-          const key = ;
+          const key = `${y}-${String(m + 1).padStart(2, '0')}`;
           set({
             residents: data.residents ?? get().residents,
             preferences: data.preferences ?? get().preferences,
