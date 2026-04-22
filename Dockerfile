@@ -9,8 +9,8 @@ RUN npm run build
 # Stage 2: Run the server
 FROM node:20-alpine
 WORKDIR /app
-COPY server/package*.json ./server/
-RUN cd server && npm ci --omit=dev
+COPY server/package.json ./server/
+RUN cd server && npm install --omit=dev
 COPY server/ ./server/
 COPY --from=builder /app/dist ./dist
 EXPOSE 3000
