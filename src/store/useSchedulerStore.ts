@@ -7,6 +7,7 @@ interface SchedulerState {
   residents: Resident[];
   posts: Post[];
   schedule: Schedule;
+  schedules: Record<string, Schedule>;
   preferences: Record<string, ResidentPreferences>;
   month: number;
   year: number;
@@ -80,6 +81,7 @@ export const useSchedulerStore = create<SchedulerState>()(
         { id: 'p_ex3', name: '\u05d0\u05e9\u05d3\u05d5\u05d3', type: 'other', requiresRestDay: false, allowedGroups: ['\u05de\u05d9\u05d5\u05df','\u05d1\u05db\u05d9\u05e8'], priority: 8, daysOfWeek: [0, 1, 2, 3, 4] }
       ],
       schedule: {},
+      schedules: {},
       preferences: {},
       month: new Date().getMonth(),
       year: new Date().getFullYear(),
@@ -100,11 +102,18 @@ export const useSchedulerStore = create<SchedulerState>()(
         newSchedule[day] = { ...newSchedule[day], ...updates };
         return { schedule: newSchedule };
       }),
-      setMonthYear: (month, year) => set({ month, year }),
+      setMonthYear: (newMonth, newYear) => {
+        const { month, year, schedule, schedules } = get();
+        const currentKey = ;
+        const newKey = ;
+        const updatedSchedules = { ...schedules, [currentKey]: schedule };
+        set({ month: newMonth, year: newYear, schedule: updatedSchedules[newKey] ?? {}, schedules: updatedSchedules });
+      },
       runGenerator: (config) => {
-        const { residents, posts, preferences } = get();
+        const { residents, posts, preferences, month, year } = get();
         const newSchedule = generateSchedule({ residents, posts, preferences, config });
-        set({ schedule: newSchedule });
+        const key = ;
+        set((state) => ({ schedule: newSchedule, schedules: { ...state.schedules, [key]: newSchedule } }));
       },
       setAdminMode: async (password: string): Promise<boolean> => {
         try {
@@ -130,12 +139,17 @@ export const useSchedulerStore = create<SchedulerState>()(
           if (!res.ok) return;
           const data = await res.json();
           if (!data) return;
+          const loadedSchedules = data.schedules ?? {};
+          const m = data.month ?? get().month;
+          const y = data.year ?? get().year;
+          const key = ;
           set({
             residents: data.residents ?? get().residents,
             preferences: data.preferences ?? get().preferences,
-            schedule: data.schedule ?? get().schedule,
-            month: data.month ?? get().month,
-            year: data.year ?? get().year,
+            schedules: loadedSchedules,
+            schedule: loadedSchedules[key] ?? data.schedule ?? get().schedule,
+            month: m,
+            year: y,
           });
         } catch {
           // Server not available - dev mode, use localStorage
@@ -149,6 +163,7 @@ export const useSchedulerStore = create<SchedulerState>()(
         residents: state.residents,
         preferences: state.preferences,
         schedule: state.schedule,
+        schedules: state.schedules,
         month: state.month,
         year: state.year,
       }),
@@ -173,6 +188,7 @@ useSchedulerStore.subscribe((state) => {
           residents: state.residents,
           preferences: state.preferences,
           schedule: state.schedule,
+          schedules: state.schedules,
           month: state.month,
           year: state.year,
         }),

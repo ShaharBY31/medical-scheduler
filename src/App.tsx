@@ -33,7 +33,7 @@ function App() {
                 <Calendar className="w-5 h-5 text-white" />
               </div>
               <h1 className="text-xl font-bold bg-gradient-to-l from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                Medical Scheduler V2
+                סידור אורתופדיה קפלן
               </h1>
             </div>
           </div>
@@ -55,7 +55,7 @@ function App() {
                 <Calendar className="w-5 h-5 text-white" />
               </div>
               <h1 className="text-xl font-bold bg-gradient-to-l from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                Medical Scheduler V2
+                סידור אורתופדיה קפלן
               </h1>
             </div>
 

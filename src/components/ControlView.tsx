@@ -40,7 +40,7 @@ function rowCategory(post: { id: string; type: string }): string {
 }
 
 export default function ControlView() {
-  const { schedule, month, year, posts, residents } = useSchedulerStore();
+  const { schedule, month, year, posts, residents, setMonthYear } = useSchedulerStore();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
   const hasSchedule = Object.keys(schedule).length > 0;
 
@@ -97,6 +97,18 @@ export default function ControlView() {
 
   const monthLabel = new Date(year, month).toLocaleDateString('he-IL', { month: 'long', year: 'numeric' });
 
+  const goToPrevMonth = () => {
+    if (month === 0) setMonthYear(11, year - 1);
+    else setMonthYear(month - 1, year);
+  };
+  const goToNextMonth = () => {
+    const today = new Date();
+    if (year > today.getFullYear() || (year === today.getFullYear() && month >= today.getMonth())) return;
+    if (month === 11) setMonthYear(0, year + 1);
+    else setMonthYear(month + 1, year);
+  };
+  const isCurrentMonth = new Date().getFullYear() === year && new Date().getMonth() === month;
+
   if (!hasSchedule) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
@@ -114,10 +126,18 @@ export default function ControlView() {
 
   return (
     <div dir="rtl" className="flex flex-col gap-3">
-      {/* Month title — centered */}
-      <div className="text-center">
-        <h2 className="text-xl font-bold text-gray-800 tracking-tight">{monthLabel}</h2>
-        <p className="text-xs text-gray-400 mt-0.5">סביבת בקרה · קריאה בלבד</p>
+      {/* Month navigation */}
+      <div className="flex items-center justify-center gap-3">
+        <button onClick={goToNextMonth} disabled={isCurrentMonth} className="p-1.5 rounded-lg hover:bg-gray-100 disabled:opacity-20 transition-colors" title="חודש הבא">
+          <svg className="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+        </button>
+        <div className="text-center">
+          <h2 className="text-xl font-bold text-gray-800 tracking-tight">{monthLabel}</h2>
+          <p className="text-xs text-gray-400 mt-0.5">סביבת בקרה · קריאה בלבד</p>
+        </div>
+        <button onClick={goToPrevMonth} className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors" title="חודש קודם">
+          <svg className="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+        </button>
       </div>
 
       {/* Big centered week nav */}
