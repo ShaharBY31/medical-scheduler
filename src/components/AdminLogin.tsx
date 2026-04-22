@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type FormEvent } from 'react';
 import { Lock } from 'lucide-react';
 import { useSchedulerStore } from '../store/useSchedulerStore';
 
@@ -12,7 +12,7 @@ export default function AdminLogin({ onClose }: Props) {
   const [loading, setLoading] = useState(false);
   const setAdminMode = useSchedulerStore((s) => s.setAdminMode);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(false);
